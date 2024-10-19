@@ -4,17 +4,15 @@ on:
   push:
     tags:
       - '*'
-  workflow_dispatch:  # Added to trigger the workflow manually
+  workflow_dispatch:  # Allow manual trigger
 
 env:
   REGISTRY_IMAGE: danswer/danswer-backend
   LATEST_TAG: ${{ contains(github.ref_name, 'latest') }}
-  
+
 jobs:
   build-and-push:
-    # TODO: investigate a matrix build like the web container 
-    # See https://runs-on.com/runners/linux/
-    runs-on: [runs-on,runner=8cpu-linux-x64,"run-id=${{ github.run_id }}"]
+    runs-on: ubuntu-latest  # Changed from custom runner label to a standard one
 
     steps:
     - name: Checkout code
@@ -56,4 +54,3 @@ jobs:
         image-ref: docker.io/${{ env.REGISTRY_IMAGE }}:${{ github.ref_name }}
         severity: 'CRITICAL,HIGH'
         trivyignores: ./backend/.trivyignore
-
