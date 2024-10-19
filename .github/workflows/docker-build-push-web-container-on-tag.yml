@@ -30,7 +30,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: List Files for Debugging
+        run: |
+          ls -R .  # List all files and directories for troubleshooting
+
       - name: Install Dependencies
+        working-directory: ./web  # Point to the directory where package.json is located
         run: |
           npm install
           npm install sharp  # Install sharp for image optimization
