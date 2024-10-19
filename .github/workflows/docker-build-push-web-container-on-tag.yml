@@ -34,12 +34,7 @@ jobs:
         run: |
           ls -R .  # List all files and directories for troubleshooting
 
-      - name: Install Dependencies
-        working-directory: ./web  # Point to the directory where package.json is located
-        run: |
-          npm install
-          npm install sharp  # Install sharp for image optimization
-
+  
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
