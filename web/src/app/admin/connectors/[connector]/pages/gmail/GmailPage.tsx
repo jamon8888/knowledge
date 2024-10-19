@@ -140,7 +140,7 @@ export const GmailMain = () => {
       {isAdmin && (
         <>
           <Title className="mb-2 mt-6 ml-auto mr-auto">
-            Step 2: Authenticate with Danswer
+            Step 2: Authenticate with Hacienda Knowledge 
           </Title>
           <GmailOAuthSection
             setPopup={setPopup}

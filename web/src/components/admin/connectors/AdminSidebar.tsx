@@ -79,7 +79,7 @@ export function AdminSidebar({ collections }: { collections: Collection[] }) {
               <p className="ml-1 break-words line-clamp-2 ellipsis leading-none">
                 Back to{" "}
                 {combinedSettings.enterpriseSettings?.application_name ||
-                  "Danswer"}
+                  "Hacienda Knowledge"}
               </p>
             </button>
           </Link>
@@ -124,7 +124,7 @@ export function AdminSidebar({ collections }: { collections: Collection[] }) {
           key={"danswerVersion"}
         >
           <h2 className="text-xs text-text w-52 font-medium pb-2">
-            Danswer version: {combinedSettings.webVersion}
+            DHacienda Knowledge version: {combinedSettings.webVersion}
           </h2>
         </div>
       )}

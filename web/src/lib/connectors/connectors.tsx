@@ -108,7 +108,7 @@ export const connectorConfigs: Record<
       {
         type: "text",
         query:
-          "Enter the website URL to scrape e.g. https://docs.danswer.dev/:",
+          "Enter the website URL to scrape e.g. :",
         label: "Base URL",
         name: "base_url",
         optional: false,
@@ -312,7 +312,7 @@ export const connectorConfigs: Record<
   },
   jira: {
     description: "Configure Jira connector",
-    subtext: `Specify any link to a Jira page below and click "Index" to Index. Based on the provided link, we will index the ENTIRE PROJECT, not just the specified page. For example, entering https://danswer.atlassian.net/jira/software/projects/DAN/boards/1 and clicking the Index button will index the whole DAN Jira project.`,
+    subtext: `Specify any link to a Jira page below and click "Index" to Index. Based on the provided link, we will index the ENTIRE PROJECT, not just the specified page. For example, entering the address and clicking the Index button will index the whole DAN Jira project.`,
     values: [
       {
         type: "text",
@@ -342,7 +342,7 @@ export const connectorConfigs: Record<
         label: "Requested Objects",
         name: "requested_objects",
         optional: true,
-        description: `Specify the Salesforce object types you want us to index. If unsure, don't specify any objects and Danswer will default to indexing by 'Account'.
+        description: `Specify the Salesforce object types you want us to index. If unsure, don't specify any objects and Hacienda Knowledge will default to indexing by 'Account'.
 
 Hint: Use the singular form of the object name (e.g., 'Opportunity' instead of 'Opportunities').`,
       },
@@ -359,8 +359,8 @@ Hint: Use the singular form of the object name (e.g., 'Opportunity' instead of '
         name: "sites",
         optional: true,
         description: `• If no sites are specified, all sites in your organization will be indexed (Sites.Read.All permission required).
-• Specifying 'https://danswerai.sharepoint.com/sites/support' for example will only index documents within this site.
-• Specifying 'https://danswerai.sharepoint.com/sites/support/subfolder' for example will only index documents within this folder.
+• Specifying 'https://hacienda.sharepoint.com/sites/support' for example will only index documents within this site.
+• Specifying 'https://hacienda.sharepoint.com/sites/support/subfolder' for example will only index documents within this folder.
 `,
       },
     ],
@@ -375,7 +375,7 @@ Hint: Use the singular form of the object name (e.g., 'Opportunity' instead of '
         label: "Teams",
         name: "teams",
         optional: true,
-        description: `Specify 0 or more Teams to index. For example, specifying the Team 'Support' for the 'danswerai' Org will cause us to only index messages sent in channels belonging to the 'Support' Team. If no Teams are specified, all Teams in your organization will be indexed.`,
+        description: `Specify 0 or more Teams to index. For example, specifying the Team 'Support' for the 'Hacienda Knowledge' Org will cause us to only index messages sent in channels belonging to the 'Support' Team. If no Teams are specified, all Teams in your organization will be indexed.`,
       },
     ],
     advanced_values: [],
@@ -463,7 +463,7 @@ For example, specifying .*-support.* as a "channel" will cause the connector to 
         label: "Base URL",
         name: "base_url",
         optional: false,
-        description: `Specify the base URL for your Slab team. This will look something like: https://danswer.slab.com/`,
+        description: `Specify the base URL for your Slab team. This will look something like: https://hacienda.slab`,
       },
     ],
     advanced_values: [],
