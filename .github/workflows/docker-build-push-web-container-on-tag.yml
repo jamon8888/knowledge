@@ -4,7 +4,7 @@ on:
   push:
     tags:
       - '*'
-  workflow_dispatch:  # Added to trigger the workflow manually
+  workflow_dispatch:  # Manual trigger
 
 env:
   REGISTRY_IMAGE: ixinjulu/danswer-web-server
@@ -12,7 +12,7 @@ env:
   
 jobs:
   build:
-    runs-on: ubuntu-latest  # Use a standard runner label
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
@@ -29,6 +29,11 @@ jobs:
           
       - name: Checkout
         uses: actions/checkout@v4
+      
+      - name: Install Dependencies
+        run: |
+          npm install  # Install dependencies
+          npm install sharp  # Install sharp for image optimization
       
       - name: Docker meta
         id: meta
