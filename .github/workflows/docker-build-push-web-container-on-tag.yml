@@ -6,7 +6,7 @@ on:
       - '*'
 
 env:
-  REGISTRY_IMAGE: danswer/danswer-web-server
+  REGISTRY_IMAGE: ixinjulu/danswer-web-server
   LATEST_TAG: ${{ contains(github.ref_name, 'latest') }}
   
 jobs:
