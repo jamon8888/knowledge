@@ -62,7 +62,7 @@ services:
         max-file: "6"
 
   web_server:
-    image: danswer/danswer-web-server:${IMAGE_TAG:-latest}
+    image: ixinjulu/danswer-web-server:${IMAGE_TAG:-latest}
     build:
       context: ../../web
       dockerfile: Dockerfile
