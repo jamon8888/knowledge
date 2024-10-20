@@ -81,7 +81,7 @@ services:
     env_file:
       - .env
     environment:
-      - INTERNAL_URL=http://api_server:8080
+      - INTERNAL_URL=http://srv613453.hstgr.cloud:8080
     logging:
       driver: json-file
       options:
