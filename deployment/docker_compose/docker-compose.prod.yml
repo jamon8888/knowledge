@@ -22,6 +22,8 @@ services:
       - VESPA_HOST=index
       - REDIS_HOST=cache
       - MODEL_SERVER_HOST=${MODEL_SERVER_HOST:-inference_model_server}
+    ports:
+      - "8080:8080"  # Expose API server port
     extra_hosts:
       - "host.docker.internal:host-gateway"
     logging:
@@ -29,9 +31,6 @@ services:
       options:
         max-size: "50m"
         max-file: "6"
-    ports:
-      - "8080:8080"
-
 
   background:
     image: danswer/danswer-backend:${IMAGE_TAG:-latest}
@@ -81,7 +80,7 @@ services:
     env_file:
       - .env
     environment:
-      - INTERNAL_URL=http://srv613453.hstgr.cloud:8080
+      - INTERNAL_URL=http://api_server:8080  # Internal Docker network URL
     logging:
       driver: json-file
       options:
@@ -90,12 +89,10 @@ services:
     ports:
       - "3000:3000"
 
-
   relational_db:
     image: postgres:15.2-alpine
     command: -c 'max_connections=250'
     restart: always
-    # POSTGRES_USER and POSTGRES_PASSWORD should be set in .env file
     env_file:
       - .env
     volumes:
@@ -105,7 +102,6 @@ services:
       options:
         max-size: "50m"
         max-file: "6"
-
 
   inference_model_server:
     image: danswer/danswer-model-server:${IMAGE_TAG:-latest}
@@ -122,17 +118,14 @@ services:
     restart: on-failure
     environment:
       - MIN_THREADS_ML_MODELS=${MIN_THREADS_ML_MODELS:-}
-      # Set to debug to get more fine-grained logs
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=${LOG_LEVEL:-info}  # Set to debug for more logs
     volumes:
-      # Not necessary, this is just to reduce download time during startup
       - model_cache_huggingface:/root/.cache/huggingface/
     logging:
       driver: json-file
       options:
         max-size: "50m"
         max-file: "6"
-
 
   indexing_model_server:
     image: danswer/danswer-model-server:${IMAGE_TAG:-latest}
@@ -150,11 +143,9 @@ services:
     environment:
       - MIN_THREADS_ML_MODELS=${MIN_THREADS_ML_MODELS:-}
       - INDEXING_ONLY=True
-      # Set to debug to get more fine-grained logs
-      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_LEVEL=${LOG_LEVEL:-info}  # Set to debug for more logs
       - VESPA_SEARCHER_THREADS=${VESPA_SEARCHER_THREADS:-1}
     volumes:
-      # Not necessary, this is just to reduce download time during startup
       - indexing_huggingface_model_cache:/root/.cache/huggingface/
     logging:
       driver: json-file
@@ -162,8 +153,6 @@ services:
         max-size: "50m"
         max-file: "6"
 
-
-  # This container name cannot have an underscore in it due to Vespa expectations of the URL
   index:
     image: vespaengine/vespa:8.277.17
     restart: always
@@ -178,12 +167,9 @@ services:
         max-size: "50m"
         max-file: "6"
 
-
   nginx:
     image: nginx:1.23.4-alpine
     restart: always
-    # nginx will immediately crash with `nginx: [emerg] host not found in upstream`
-    # if api_server / web_server are not up 
     depends_on:
       - api_server
       - web_server
@@ -194,27 +180,17 @@ services:
       - ../data/nginx:/etc/nginx/conf.d
       - ../data/certbot/conf:/etc/letsencrypt
       - ../data/certbot/www:/var/www/certbot
-    # sleep a little bit to allow the web_server / api_server to start up. 
-    # Without this we've seen issues where nginx shows no error logs but 
-    # does not recieve any traffic
     logging:
       driver: json-file
       options:
         max-size: "50m"
         max-file: "6"
-    # The specified script waits for the api_server to start up. 
-    # Without this we've seen issues where nginx shows no error logs but 
-    # does not recieve any traffic  
-    # NOTE: we have to use dos2unix to remove Carriage Return chars from the file
-    # in order to make this work on both Unix-like systems and windows
     command: > 
       /bin/sh -c "dos2unix /etc/nginx/conf.d/run-nginx.sh 
       && /etc/nginx/conf.d/run-nginx.sh app.conf.template"
     env_file:
       - .env.nginx
 
-
-  # follows https://pentacent.medium.com/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71
   certbot:
     image: certbot/certbot
     restart: always
@@ -228,20 +204,15 @@ services:
         max-file: "6"
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
-
   cache:
     image: redis:7.4-alpine
     restart: always
     ports:
       - '6379:6379'
-    # docker silently mounts /data even without an explicit volume mount, which enables
-    # persistence. explicitly setting save and appendonly forces ephemeral behavior.
     command: redis-server --save "" --appendonly no
-
 
 volumes:
   db_volume:
   vespa_volume:
-  # Created by the container itself
   model_cache_huggingface:
   indexing_huggingface_model_cache:
