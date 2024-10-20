@@ -85,6 +85,8 @@ services:
       options:
         max-size: "50m"
         max-file: "6"
+    ports:
+      - "3000:3000"
 
 
   relational_db:
