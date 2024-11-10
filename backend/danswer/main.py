@@ -25,6 +25,7 @@ from danswer.auth.schemas import UserCreate
 from danswer.auth.schemas import UserRead
 from danswer.auth.schemas import UserUpdate
 from danswer.auth.users import auth_backend
+from danswer.auth.users import BasicAuthenticationError
 from danswer.auth.users import fastapi_users
 from danswer.configs.app_configs import APP_API_PREFIX
 from danswer.configs.app_configs import APP_HOST
@@ -32,7 +33,6 @@ from danswer.configs.app_configs import APP_PORT
 from danswer.configs.app_configs import AUTH_TYPE
 from danswer.configs.app_configs import DISABLE_GENERATIVE_AI
 from danswer.configs.app_configs import LOG_ENDPOINT_LATENCY
-from danswer.configs.app_configs import MULTI_TENANT
 from danswer.configs.app_configs import OAUTH_CLIENT_ID
 from danswer.configs.app_configs import OAUTH_CLIENT_SECRET
 from danswer.configs.app_configs import POSTGRES_API_SERVER_POOL_OVERFLOW
@@ -94,7 +94,9 @@ from danswer.utils.variable_functionality import fetch_versioned_implementation
 from danswer.utils.variable_functionality import global_version
 from danswer.utils.variable_functionality import set_is_ee_based_on_env_variable
 from shared_configs.configs import CORS_ALLOWED_ORIGIN
+from shared_configs.configs import MULTI_TENANT
 from shared_configs.configs import SENTRY_DSN
+
 
 logger = setup_logger()
 
@@ -183,7 +185,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
         # If we are multi-tenant, we need to only set up initial public tables
         with Session(engine) as db_session:
-            setup_danswer(db_session)
+            setup_danswer(db_session, None)
     else:
         setup_multitenant_danswer()
 
@@ -193,7 +195,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
 def log_http_error(_: Request, exc: Exception) -> JSONResponse:
     status_code = getattr(exc, "status_code", 500)
-    if status_code >= 400:
+
+    if isinstance(exc, BasicAuthenticationError):
+        # For BasicAuthenticationError, just log a brief message without stack trace (almost always spam)
+        logger.error(f"Authentication failed: {str(exc)}")
+
+    elif status_code >= 400:
         error_msg = f"{str(exc)}\n"
         error_msg += "".join(traceback.format_tb(exc.__traceback__))
         logger.error(error_msg)
@@ -213,13 +220,12 @@ def get_application() -> FastAPI:
         sentry_sdk.init(
             dsn=SENTRY_DSN,
             integrations=[StarletteIntegration(), FastApiIntegration()],
-            traces_sample_rate=0.5,
+            traces_sample_rate=0.1,
         )
         logger.info("Sentry initialized")
     else:
         logger.debug("Sentry DSN not provided, skipping Sentry initialization")
 
-    # Add the custom exception handler
     application.add_exception_handler(status.HTTP_400_BAD_REQUEST, log_http_error)
     application.add_exception_handler(status.HTTP_401_UNAUTHORIZED, log_http_error)
     application.add_exception_handler(status.HTTP_403_FORBIDDEN, log_http_error)
@@ -276,12 +282,14 @@ def get_application() -> FastAPI:
             prefix="/auth",
             tags=["auth"],
         )
+
         include_router_with_global_prefix_prepended(
             application,
             fastapi_users.get_register_router(UserRead, UserCreate),
             prefix="/auth",
             tags=["auth"],
         )
+
         include_router_with_global_prefix_prepended(
             application,
             fastapi_users.get_reset_password_router(),

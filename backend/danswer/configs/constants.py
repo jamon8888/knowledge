@@ -31,9 +31,6 @@ DISABLED_GEN_AI_MSG = (
     "You can still use Danswer as a search engine."
 )
 
-# Prefix used for all tenant ids
-TENANT_ID_PREFIX = "tenant_"
-
 # Postgres connection constants for application_name
 POSTGRES_WEB_APP_NAME = "web"
 POSTGRES_INDEXER_APP_NAME = "indexer"
@@ -128,6 +125,8 @@ class DocumentSource(str, Enum):
     OCI_STORAGE = "oci_storage"
     XENFORO = "xenforo"
     NOT_APPLICABLE = "not_applicable"
+    FRESHDESK = "freshdesk"
+    FIREFLIES = "fireflies"
 
 
 DocumentSourceRequiringTenantContext: list[DocumentSource] = [DocumentSource.FILE]
@@ -226,6 +225,9 @@ class DanswerRedisLocks:
 
     PRUNING_LOCK_PREFIX = "da_lock:pruning"
     INDEXING_METADATA_PREFIX = "da_metadata:indexing"
+
+    SLACK_BOT_LOCK = "da_lock:slack_bot"
+    SLACK_BOT_HEARTBEAT_PREFIX = "da_heartbeat:slack_bot"
 
 
 class DanswerCeleryPriority(int, Enum):

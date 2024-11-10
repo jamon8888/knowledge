@@ -58,7 +58,7 @@ export function ClientLayout({
   return (
     <div className="h-screen overflow-y-hidden">
       <div className="flex h-full">
-        <div className="flex-none text-text-settings-sidebar bg-background-settings-sidebar w-[250px] z-20 pt-4 pb-8 h-full border-r border-border miniscroll overflow-auto">
+        <div className="flex-none text-text-settings-sidebar bg-background-sidebar w-[250px] z-20 pt-4 pb-8 h-full border-r border-border miniscroll overflow-auto">
           <AdminSidebar
             collections={[
               {
@@ -289,20 +289,20 @@ export function ClientLayout({
                                 ),
                                 link: "/admin/groups",
                               },
-                              {
-                                name: (
-                                  <div className="flex">
-                                    <KeyIconSkeleton
-                                      className="text-icon-settings-sidebar"
-                                      size={18}
-                                    />
-                                    <div className="ml-1">API Keys</div>
-                                  </div>
-                                ),
-                                link: "/admin/api-key",
-                              },
                             ]
                           : []),
+                        {
+                          name: (
+                            <div className="flex">
+                              <KeyIconSkeleton
+                                className="text-icon-settings-sidebar"
+                                size={18}
+                              />
+                              <div className="ml-1">API Keys</div>
+                            </div>
+                          ),
+                          link: "/admin/api-key",
+                        },
                         {
                           name: (
                             <div className="flex">

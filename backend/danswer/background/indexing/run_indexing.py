@@ -118,7 +118,13 @@ def _run_indexing(
     """
     start_time = time.time()
 
+    if index_attempt.search_settings is None:
+        raise ValueError(
+            "Search settings must be set for indexing. This should not be possible."
+        )
+
     search_settings = index_attempt.search_settings
+
     index_name = search_settings.index_name
 
     # Only update cc-pair status for primary index jobs
@@ -331,7 +337,7 @@ def _run_indexing(
                 or index_attempt.status != IndexingStatus.IN_PROGRESS
             ):
                 mark_attempt_failed(
-                    index_attempt,
+                    index_attempt.id,
                     db_session,
                     failure_reason=str(e),
                     full_exception_trace=traceback.format_exc(),
@@ -366,7 +372,7 @@ def _run_indexing(
         and index_attempt_md.num_exceptions >= batch_num
     ):
         mark_attempt_failed(
-            index_attempt,
+            index_attempt.id,
             db_session,
             failure_reason="All batches exceptioned.",
         )
